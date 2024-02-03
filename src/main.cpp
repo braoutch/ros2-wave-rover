@@ -10,7 +10,5 @@ int main(int argc, char *argv[])
     std::cout << "Hello, Gros Pote !" << std::endl;
 
     RobotController robot;
-
-
     // return a.exec();
 }

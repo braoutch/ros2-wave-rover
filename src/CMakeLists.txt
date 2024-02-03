@@ -14,11 +14,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core SerialPort REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core SerialPort REQUIRED)
 
-FILE(GLOB_RECURSE SRC ${CMAKE_SOURCE_DIR}/source/*.cpp)
+#ROS 2 stuff
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+
+FILE(GLOB_RECURSE SRC ${CMAKE_SOURCE_DIR}/source/*.cpp ${CMAKE_SOURCE_DIR}/include/*.hpp)
 
 include_directories(GrosPote ${CMAKE_SOURCE_DIR}/include)
 
 add_executable(GrosPote main.cpp ${SRC}
 )
-
+ament_target_dependencies(GrosPote rclcpp geometry_msgs)
 target_link_libraries(GrosPote Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::SerialPort)
+
