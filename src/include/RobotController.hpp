@@ -20,6 +20,7 @@ class RobotController {
         bool DisableWifi();
         bool ScanWifi();
         bool EmergencyStop();
+        bool SendEmergencyStop();
         bool SetOled(int row, QString content);
         bool ResetOled();
         bool GetInformation(INFO_TYPE info_type, QString& response);
@@ -32,8 +33,11 @@ class RobotController {
         std::unique_ptr<std::thread> _execThread;
         rclcpp::Executor::SharedPtr _executor;
         void RunRos2Exectutor();
-
         bool SendGenericCmd(WAVE_ROVER_COMMAND_TYPE command, QString& result);
         bool SendGenericCmd(WAVE_ROVER_COMMAND_TYPE command);
+
+        bool DisplayMessage(int seconds, QString line_1, QString line_2, QString line_3, QString line_4);
+        bool DisplayRollingMessage(QString line);
+        int _last_current_debug_row;
 };
 

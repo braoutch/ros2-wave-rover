@@ -5,6 +5,7 @@
 #include <RoverCommands.hpp>
 #include <QDebug>
 #include <algorithm>
+#include<QtConcurrent/QtConcurrent>
 
 RobotController::RobotController() {
     _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 100000);
@@ -14,9 +15,12 @@ RobotController::RobotController() {
     _execThread = std::make_unique<std::thread>(&RobotController::RunRos2Exectutor, this);
 
     _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ SendCmdVel(msg); });
+
+     DisplayMessage(5, "", "Gros Pote", "se réveille", "");
 }
 
 RobotController::~RobotController() {
+    SendEmergencyStop();
     rclcpp::shutdown();
     _executor->cancel();
     if (_execThread->joinable()) {
@@ -32,6 +36,24 @@ void RobotController::RunRos2Exectutor(){
     _executor->remove_node(_pROS2Subscriber);
 }
 
+bool RobotController::DisplayMessage(int seconds, QString line_1, QString line_2, QString line_3, QString line_4){
+    ResetOled();
+    SetOled(0, line_1);
+    SetOled(1, line_2);
+    SetOled(2, line_3);
+    SetOled(3, line_4);
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    return ResetOled();
+}
+
+bool RobotController::DisplayRollingMessage(QString line){
+    ResetOled();
+    _last_current_debug_row ++;
+    if(_last_current_debug_row > 3) _last_current_debug_row = 0;
+    return SetOled(_last_current_debug_row, line);
+
+}
 
 bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
     qDebug() << "Called.";
@@ -77,6 +99,9 @@ bool RobotController::DisableWifi(){
     return SendGenericCmd(WAVE_ROVER_COMMAND_TYPE::WIFI_OFF);
 }
 
+bool RobotController::SendEmergencyStop() {
+    return SendGenericCmd(WAVE_ROVER_COMMAND_TYPE::EMERGENCY_STOP);
+}
 
 bool RobotController::EmergencyStop(){
     return SendGenericCmd(WAVE_ROVER_COMMAND_TYPE::EMERGENCY_STOP);

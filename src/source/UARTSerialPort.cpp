@@ -29,9 +29,9 @@ UARTSerialPort::UARTSerialPort(QString path, int baudrate) {
 
     QString command = "Hello You !";
     sendRequestSync(command);
-    QString response;
-    bool b = getResponseSync("Hello you ?", response);
-    qDebug() << b << " " << response;
+//    QString response;
+//    bool b = getResponseSync("Hello you ?", response);
+//    qDebug() << b << " " << response;
 
 }
 
@@ -42,6 +42,11 @@ UARTSerialPort::~UARTSerialPort() {
 bool UARTSerialPort::sendRequestSync(const QString& text)
 {
     std::lock_guard<std::mutex> lock(_serial_mutex);
+    if(!isAvailable())
+    {
+        qDebug() << "Serial Port is down!";
+        return false;
+    }
     _serial.write((text + "\r\n").toUtf8());
     return _serial.waitForBytesWritten();
 }
@@ -49,6 +54,12 @@ bool UARTSerialPort::sendRequestSync(const QString& text)
 bool UARTSerialPort::getResponseSync(const QString& command, QString& response)
 {
     std::lock_guard<std::mutex> lock(_serial_mutex);
+    if(!isAvailable())
+    {
+        qDebug() << "Serial Port is down!";
+        return false;
+    }
+
     _serial.write((command + "\r\n").toUtf8());
     if (_serial.waitForBytesWritten(_writeTimeout)) {
         // read response
@@ -81,10 +92,20 @@ bool UARTSerialPort::sendRequestSync(const QByteArray& text)
 bool UARTSerialPort::readResponse()
 {
     _response.append(_serial.readAll());
+    return false;
 }
 
 bool UARTSerialPort::isAvailable()
 {
+    if(_serial.isOpen())
+        return true;
+
+    else
+    {
+        qDebug() << "Trying to recover the Serial Port...";
+        _serial.close();
+        return _serial.open(QIODevice::ReadWrite);
+    }
     return false;
 }
 
