@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+// https://www.waveshare.com/wiki/WAVE_ROVER
 
 enum class WAVE_ROVER_COMMAND_TYPE {
     BUS_SERVO_MID=-5,
@@ -39,69 +40,6 @@ enum class INFO_TYPE {
     WIFI,
     INA219
 };
-
-//std::string WaveRoverCommandTypesToString(WaveRoverCommandTypes command) {
-//  switch (command) {
-//    case WaveRoverCommandTypes::BUS_SERVO_MID:
-//      return "BUS_SERVO_MID";
-//    case WaveRoverCommandTypes::PWM_SERVO_MID:
-//      return "PWM_SERVO_MID";
-//    case WaveRoverCommandTypes::OLED_DEFAULT:
-//      return "OLED_DEFAULT";
-//    case WaveRoverCommandTypes::EMERGENCY_STOP:
-//      return "EMERGENCY_STOP";
-//    case WaveRoverCommandTypes::SPEED_INPUT:
-//      return "SPEED_INPUT";
-//    case WaveRoverCommandTypes::PID_SET:
-//      return "PID_SET";
-//    case WaveRoverCommandTypes::OLED_SET:
-//      return "OLED_SET";
-//    case WaveRoverCommandTypes::PWM_SERVO_CONTROL:
-//      return "PWM_SERVO_CONTROL";
-//    case WaveRoverCommandTypes::BUS_SERVO_CONTROL:
-//      return "BUS_SERVO_CONTROL";
-//    case WaveRoverCommandTypes::BUS_SERVO_INFO:
-//      return "BUS_SERVO_INFO";
-//    case WaveRoverCommandTypes::BUS_SERVO_ID_SET:
-//      return "BUS_SERVO_ID_SET";
-//    case WaveRoverCommandTypes::BUS_SERVO_TORQUE_LOCK:
-//      return "BUS_SERVO_TORQUE_LOCK";
-//    case WaveRoverCommandTypes::BUS_SERVO_TORQUE_LIMIT:
-//      return "BUS_SERVO_TORQUE_LIMIT";
-//    case WaveRoverCommandTypes::BUS_SERVO_MODE:
-//      return "BUS_SERVO_MODE";
-//    case WaveRoverCommandTypes::WIFI_SCAN:
-//      return "WIFI_SCAN";
-//    case WaveRoverCommandTypes::WIFI_TRY_STA:
-//      return "WIFI_TRY_STA";
-//    case WaveRoverCommandTypes::WIFI_AP_DEFAULT:
-//      return "WIFI_AP_DEFAULT";
-//    case WaveRoverCommandTypes::WIFI_OFF:
-//      return "WIFI_OFF";
-//    case WaveRoverCommandTypes::INA219_INFO:
-//      return "INA219_INFO";
-//    case WaveRoverCommandTypes::IMU_INFO:
-//      return "IMU_INFO";
-//    case WaveRoverCommandTypes::ENCODER_INFO:
-//      return "ENCODER_INFO";
-//    case WaveRoverCommandTypes::DEVICE_INFO:
-//      return "DEVICE_INFO";
-//    case WaveRoverCommandTypes::IO_IR_CUT:
-//      return "IO_IR_CUT";
-//    case WaveRoverCommandTypes::SET_SPD_RATE:
-//      return "SET_SPD_RATE";
-//    case WaveRoverCommandTypes::GET_SPD_RATE:
-//      return "GET_SPD_RATE";
-//    case WaveRoverCommandTypes::SPD_RATE_SAVE:
-//      return "SPD_RATE_SAVE";
-//    case WaveRoverCommandTypes::GET_NVS_SPACE:
-//      return "GET_NVS_SPACE";
-//    case WaveRoverCommandTypes::NVS_CLEAR:
-//      return "NVS_CLEAR";
-//    default:
-//      return "Unknown command";
-//  }
-//}
 
 inline std::ostream& operator<<(std::ostream& os, WAVE_ROVER_COMMAND_TYPE command) {
     switch (command) {

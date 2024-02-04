@@ -1,21 +1,56 @@
 #include <RobotController.hpp>
 #include <UARTSerialPort.hpp>
+#include <ROS2Subscriber.hpp>
 #include <json.hpp>
 #include <RoverCommands.hpp>
 #include <QDebug>
+#include <algorithm>
 
 RobotController::RobotController() {
-    _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/2", 9600);
+    _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 100000);
+
+    _pROS2Subscriber = std::make_shared<ROS2Subscriber>();
+    _executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+    _execThread = std::make_unique<std::thread>(&RobotController::RunRos2Exectutor, this);
+
+    _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ SendCmdVel(msg); });
 }
 
 RobotController::~RobotController() {
-    
+    rclcpp::shutdown();
+    _executor->cancel();
+    if (_execThread->joinable()) {
+        _execThread->join();
+    }
+    qDebug() << "ROS2 Node shut down.";
 }
 
-bool RobotController::SendCmdVel(geometry_msgs::msg::Twist cmd_vel){
-    nlohmann::json message_json = {};
+void RobotController::RunRos2Exectutor(){
+    std::cout << "STARTING EXECUTOR" << std::endl;
+    _executor->add_node(_pROS2Subscriber);
+    _executor->spin();
+    _executor->remove_node(_pROS2Subscriber);
+}
 
-    return false;
+
+bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
+    qDebug() << "Called.";
+    nlohmann::json message_json = {};
+    float l = 0, r = 0;
+
+    // Cap values at [-1 .. 1]
+    float x = std::max(std::min((double)msg->linear.x, 1.0), -1.0);
+    float z = std::max(std::min((double)msg->angular.z, 1.0), -1.0);
+
+    // Calculate the intensity of left and right wheels. Simple version.
+    // Taken from https://hackernoon.com/unicycle-to-differential-drive-courseras-control-of-mobile-robots-with-ros-and-rosbots-part-2-6d27d15f2010#1e59
+    l = (x - z) / 2;
+    r = (x + z) / 2;
+
+    message_json["T"] = WAVE_ROVER_COMMAND_TYPE::SPEED_INPUT;
+    message_json["L"] = l;
+    message_json["R"] = r;
+    return _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
 }
 
 bool RobotController::SendGenericCmd(WAVE_ROVER_COMMAND_TYPE command, QString& response){
