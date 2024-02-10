@@ -1,17 +1,21 @@
 #pragma once
 #include <QString>
+#include <QObject>
 #include <memory>
 #include <thread>
 #include <RoverCommands.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <JoypadController.hpp>
 
 // cmd_vel message type
 #include <geometry_msgs/msg/twist.hpp>
 
 class UARTSerialPort;
 class ROS2Subscriber;
+class JoypadController;
 
-class RobotController {
+class RobotController: public QObject {
+    Q_OBJECT
     public:
         RobotController();
         ~RobotController();
@@ -26,9 +30,12 @@ class RobotController {
         bool GetInformation(INFO_TYPE info_type, QString& response);
         bool SendCmdVel(geometry_msgs::msg::Twist::SharedPtr cmd_vel);
 
+public slots:
+        void JoypadCommandReceived(TimestampedDouble t1, TimestampedDouble t2);
+
     private:
         std::shared_ptr<UARTSerialPort> _pUARTSerialPort;
-
+        std::shared_ptr<JoypadController> _pJoypadController;
         std::shared_ptr<ROS2Subscriber> _pROS2Subscriber;
         std::unique_ptr<std::thread> _execThread;
         rclcpp::Executor::SharedPtr _executor;

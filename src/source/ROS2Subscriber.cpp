@@ -31,7 +31,7 @@ void ROS2Subscriber::LivenessCallback()
   builtin_interfaces::msg::Time message;
   rclcpp::Time time = this->get_clock()->now();
   message.sec = time.seconds();
-  message.sec = time.nanoseconds();
+  message.nanosec = time.nanoseconds();
 //      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
   _liveness_publisher->publish(message);
 }

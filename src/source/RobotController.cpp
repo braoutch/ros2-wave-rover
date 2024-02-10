@@ -5,17 +5,21 @@
 #include <RoverCommands.hpp>
 #include <QDebug>
 #include <algorithm>
-#include<QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
+#include <JoypadController.hpp>
 
 RobotController::RobotController() {
     _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 100000);
-
     _pROS2Subscriber = std::make_shared<ROS2Subscriber>();
     _executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     _execThread = std::make_unique<std::thread>(&RobotController::RunRos2Exectutor, this);
 
     _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ SendCmdVel(msg); });
 
+    _pJoypadController = std::make_shared<JoypadController>();
+    //QObject::connect(_pJoypadController.get(), &JoypadController::JoypadCommandAvailable, [&](TimestampedDouble t1, TimestampedDouble t2){JoypadCommandReceived();});
+    QObject::connect(_pJoypadController.get(), SIGNAL(JoypadCommandAvailable(TimestampedDouble, TimestampedDouble)), this, SLOT(JoypadCommandReceived(TimestampedDouble, TimestampedDouble)));
+    _pJoypadController->start();
      DisplayMessage(5, "", "Gros Pote", "se réveille", "");
 }
 
@@ -56,7 +60,6 @@ bool RobotController::DisplayRollingMessage(QString line){
 }
 
 bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
-    qDebug() << "Called.";
     nlohmann::json message_json = {};
     float l = 0, r = 0;
 
@@ -73,6 +76,15 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
     message_json["L"] = l;
     message_json["R"] = r;
     return _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
+}
+
+void RobotController::JoypadCommandReceived(TimestampedDouble t1, TimestampedDouble t2) {
+    qDebug() << "Joypad command received";
+    std::shared_ptr<geometry_msgs::msg::Twist> msg = std::make_shared<geometry_msgs::msg::Twist>();
+    msg->linear.x = t1.value;
+    msg->angular.z = t2.value;
+
+    SendCmdVel(msg);
 }
 
 bool RobotController::SendGenericCmd(WAVE_ROVER_COMMAND_TYPE command, QString& response){
@@ -147,4 +159,3 @@ bool RobotController::GetInformation(INFO_TYPE info_type, QString& response){
     }
     return SendGenericCmd(target_type, response);
 }
-
