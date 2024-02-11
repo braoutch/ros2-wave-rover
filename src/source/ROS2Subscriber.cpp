@@ -5,7 +5,8 @@
 using namespace std::chrono_literals;
 
 ROS2Subscriber::ROS2Subscriber() : rclcpp::Node("WaveRobotController") {
-
+    this->declare_parameter("UART_address", rclcpp::PARAMETER_STRING);
+    this->declare_parameter("enable_joypad", rclcpp::PARAMETER_INTEGER);
     _liveness_publisher = this->create_publisher<builtin_interfaces::msg::Time>("/liveness", 10);
     _liveness_timer = this->create_wall_timer(
     500ms, std::bind(&ROS2Subscriber::LivenessCallback, this));

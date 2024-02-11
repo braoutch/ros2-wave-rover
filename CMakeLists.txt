@@ -34,6 +34,7 @@ target_compile_features(gros-pote-node PUBLIC c_std_99 cxx_std_17)  # Require C9
 install(TARGETS gros-pote-node
   DESTINATION lib/${PROJECT_NAME})
 
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
 ament_target_dependencies(gros-pote-node rclcpp geometry_msgs)
 target_link_libraries(gros-pote-node Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::SerialPort)
