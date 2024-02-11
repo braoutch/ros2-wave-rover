@@ -1,4 +1,4 @@
-#include <include/JoypadController.hpp>
+#include <JoypadController.hpp>
 #include <QDebug>
 #include <chrono>
 

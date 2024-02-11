@@ -3,3 +3,5 @@ src/install/*
 src/log/*
 build/
 build-*
+log/
+install/
