@@ -9,7 +9,9 @@
 #include <JoypadController.hpp>
 
 RobotController::RobotController() {
-    _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 100000);
+    // _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 1000000);
+    _pUARTSerialPort = std::make_shared<UARTSerialPort>("", 1000000); // open automatically the first serial port that is found
+
     _pROS2Subscriber = std::make_shared<ROS2Subscriber>();
     _executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     _execThread = std::make_unique<std::thread>(&RobotController::RunRos2Exectutor, this);
@@ -17,15 +19,18 @@ RobotController::RobotController() {
     _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ SendCmdVel(msg); });
 
     _pJoypadController = std::make_shared<JoypadController>();
-    //QObject::connect(_pJoypadController.get(), &JoypadController::JoypadCommandAvailable, [&](TimestampedDouble t1, TimestampedDouble t2){JoypadCommandReceived();});
+
+    // QObject::connect(_pJoypadController.get(), &JoypadController::JoypadCommandAvailable, [&](TimestampedDouble t1, TimestampedDouble t2){JoypadCommandReceived(t1, t2);});
     QObject::connect(_pJoypadController.get(), SIGNAL(JoypadCommandAvailable(TimestampedDouble, TimestampedDouble)), this, SLOT(JoypadCommandReceived(TimestampedDouble, TimestampedDouble)));
     _pJoypadController->start();
-     DisplayMessage(5, "", "Gros Pote", "se réveille", "");
+
+    QString infos;
+    GetInformation(INFO_TYPE::DEVICE, infos);
+    DisplayMessage(5, "", "Gros Pote", "se réveille", "");
 }
 
 RobotController::~RobotController() {
     SendEmergencyStop();
-    rclcpp::shutdown();
     _executor->cancel();
     if (_execThread->joinable()) {
         _execThread->join();

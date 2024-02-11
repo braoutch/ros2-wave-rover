@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     std::cout << "Hello, Gros Pote !" << std::endl;
     rclcpp::init(argc, argv);
     RobotController robot;
+    
     return a.exec();
 }

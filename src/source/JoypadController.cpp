@@ -124,6 +124,7 @@ int JoypadController::joypad_connection_loop()
     {
         if (_has_exited)
         {
+            qDebug() << "Trying to restart the joypad thread...";
             emit JoypadCommandAvailable(TimestampedDouble(), TimestampedDouble());
             if (_joypad_thread.joinable())
             {

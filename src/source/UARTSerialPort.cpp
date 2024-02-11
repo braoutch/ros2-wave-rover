@@ -10,21 +10,34 @@ UARTSerialPort::UARTSerialPort(QString path, int baudrate) {
     const auto infos = QSerialPortInfo::availablePorts();
     std::cout << "Detected Serial port:";
     for (const QSerialPortInfo &info : infos)
+    {
         std::cout << "\n" << info.portName().toStdString() << std::endl;
+
+        if(path == "") {
+            path = info.portName();
+            path = "/dev/" + info.portName();
+        }
+    }
+
     std::cout << (infos.size() ? "----" : " None.") << std::endl;
+    qDebug() << "Opening " << path << " at baudrate " << baudrate << "...";
 
     _serial.setPortName(path);
-    _serial.setDataBits(QSerialPort::Data8);
-    _serial.setParity(QSerialPort::NoParity);
-    _serial.setStopBits(QSerialPort::OneStop);
-    _serial.setFlowControl(QSerialPort::NoFlowControl);
+    // _serial.setDataBits(QSerialPort::Data8);
+    _serial.setBaudRate(baudrate);
+    // _serial.setParity(QSerialPort::NoParity);
+    // _serial.setStopBits(QSerialPort::OneStop);
+    // _serial.setFlowControl(QSerialPort::NoFlowControl);
 
-
-    if (!_serial.open(QIODevice::ReadWrite))
+    if (!_serial.open(QIODevice::OpenModeFlag::ReadWrite))
     {
-        qDebug() << (QString("Can't open %1, error code %2")
+        qDebug() << (QString("Can't open %1, error code %2 : %3")
                      .arg(_serial.portName())
-                     .arg(_serial.error()));
+                     .arg(_serial.error())
+                     .arg(_serial.errorString()));
+        qDebug() << "Serial status: " << _serial.isOpen();
+
+        exit(0);
     }
 
     QString command = "Hello You !";
@@ -69,6 +82,7 @@ bool UARTSerialPort::getResponseSync(const QString& command, QString& response)
                 responseData += _serial.readAll();
 
             response = QString::fromUtf8(responseData);
+            qDebug() << "Message received: " << response;
             return true;
 
         } else {
