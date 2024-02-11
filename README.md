@@ -28,3 +28,14 @@ KERNEL=="ttyUSB[0-9]*",MODE="0666"
 KERNEL=="ttyACM[0-9]*",MODE="0666"
 ```
 Then unplug and replug the device.
+
+## QEMU
+```
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+```
+
+### that works better
+```
+docker buildx create --use
+docker buildx build --platform linux/arm64 -t braoutch/ros2-wave-rover:latest --push .
+```
