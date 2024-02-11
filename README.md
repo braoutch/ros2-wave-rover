@@ -39,6 +39,10 @@ Then unplug and replug the device.
 ```
 docker run -it --rm  braoutch/ros2-wave-rover ros2 launch gros-pote gros-pote-node
 ```
+or
+```
+docker run -it --rm  braoutch/ros2-wave-rover  ros2 launch gros-pote wave_rover_launch.py enable_joypad:=0 UART_address="DUMMY"
+```
 It will also run (slowly) on x86 if you ran the qemu line before.
 
 # Docker build - raspberry pi
