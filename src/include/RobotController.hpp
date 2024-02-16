@@ -33,6 +33,9 @@ class RobotController: public QObject {
 public slots:
         void JoypadCommandReceived(TimestampedDouble t1, TimestampedDouble t2);
 
+    signals:
+        void SendRequestSync(QString);
+
     private:
         std::shared_ptr<UARTSerialPort> _pUARTSerialPort;
         std::shared_ptr<JoypadController> _pJoypadController;

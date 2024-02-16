@@ -41,7 +41,7 @@ docker run -it --rm  braoutch/ros2-wave-rover ros2 launch gros-pote gros-pote-no
 ```
 or
 ```
-docker run -it --rm  braoutch/ros2-wave-rover  ros2 launch gros-pote wave_rover_launch.py enable_joypad:=0 UART_address="DUMMY"
+docker run --privileged -v /dev/ttyS0:/dev/ttyS0 -v /dev/input:/dev/input -it --rm  braoutch/ros2-wave-rover  ros2 launch gros-pote wave_rover_launch.py enable_joypad:=1 UART_address:="/dev/ttyS0"
 ```
 It will also run (slowly) on x86 if you ran the qemu line before.
 
@@ -56,4 +56,9 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ```
 docker buildx create --use
 docker buildx build --platform linux/arm64 -t braoutch/ros2-wave-rover:latest --push .
+```
+
+Send a twist message
+```
+ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}"
 ```

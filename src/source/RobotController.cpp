@@ -25,6 +25,8 @@ RobotController::RobotController() {
     _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ SendCmdVel(msg); });
 
     _pUARTSerialPort = std::make_shared<UARTSerialPort>(QString::fromStdString(UART_address), 1000000); // open automatically the first serial port that is found
+    QObject::connect(this, &RobotController::SendRequestSync, [&](QString s) { _pUARTSerialPort->sendRequestSync(s);});
+
     if(enable_joypad)
     {
         _pJoypadController = std::make_shared<JoypadController>();
@@ -32,6 +34,7 @@ RobotController::RobotController() {
         QObject::connect(_pJoypadController.get(), SIGNAL(JoypadCommandAvailable(TimestampedDouble, TimestampedDouble)), this, SLOT(JoypadCommandReceived(TimestampedDouble, TimestampedDouble)));
         _pJoypadController->start();
     }
+
     QString infos;
     GetInformation(INFO_TYPE::DEVICE, infos);
     DisplayMessage(5, "", "Gros Pote", "se réveille", "");
@@ -61,7 +64,7 @@ bool RobotController::DisplayMessage(int seconds, QString line_1, QString line_2
     SetOled(2, line_3);
     SetOled(3, line_4);
 
-    std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::seconds(15));
     return ResetOled();
 }
 
@@ -89,7 +92,10 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
     message_json["T"] = WAVE_ROVER_COMMAND_TYPE::SPEED_INPUT;
     message_json["L"] = l;
     message_json["R"] = r;
-    return _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
+
+    emit SendRequestSync(QString::fromStdString(message_json.dump()));
+
+    return true;
 }
 
 void RobotController::JoypadCommandReceived(TimestampedDouble t1, TimestampedDouble t2) {
@@ -110,7 +116,8 @@ bool RobotController::SendGenericCmd(WAVE_ROVER_COMMAND_TYPE command, QString& r
 bool RobotController::SendGenericCmd(WAVE_ROVER_COMMAND_TYPE command){
     nlohmann::json message_json = {};
     message_json["T"] = command;
-    return _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
+    _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
+    return true;
 }
 
 bool RobotController::EnableWifiHotspot(){
@@ -144,7 +151,8 @@ bool RobotController::SetOled(int row, QString content){
     message_json["T"] = WAVE_ROVER_COMMAND_TYPE::OLED_SET;
     message_json["lineNum"] = row;
     message_json["Text"] = content.toStdString();
-    return _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
+    _pUARTSerialPort->sendRequestSync(QString::fromStdString(message_json.dump()));
+    return true;
 }
 
 bool RobotController::ResetOled() {

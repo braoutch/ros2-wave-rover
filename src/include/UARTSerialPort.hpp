@@ -15,12 +15,12 @@ class UARTSerialPort : public QObject {
 
         bool isAvailable();
 
-        bool sendRequestSync(const QString& text);
+    public slots:
+        void sendRequestSync(QString);
         bool getResponseSync(const QString& command, QString& response);
         bool sendRequestSync(const QByteArray& text);
 
         bool readResponse();
-        void readResponseThread();
 
     private:
         QSerialPort _serial;

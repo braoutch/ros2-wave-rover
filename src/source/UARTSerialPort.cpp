@@ -50,16 +50,16 @@ UARTSerialPort::~UARTSerialPort() {
     _serial.close();
 }
 
-bool UARTSerialPort::sendRequestSync(const QString& text)
+void UARTSerialPort::sendRequestSync(QString text)
 {
     std::lock_guard<std::mutex> lock(_serial_mutex);
     if(!isAvailable())
     {
         qDebug() << "Serial Port is down!";
-        return false;
+        return;
     }
     _serial.write((text + "\r\n").toUtf8());
-    return _serial.waitForBytesWritten();
+    _serial.waitForBytesWritten();
 }
 
 bool UARTSerialPort::getResponseSync(const QString& command, QString& response)
@@ -84,12 +84,12 @@ bool UARTSerialPort::getResponseSync(const QString& command, QString& response)
             return true;
 
         } else {
-            qDebug() << QString("Wait read response timeout %1")
-                        .arg(QTime::currentTime().toString());
+            qDebug() << QString("Wait read response %2 timeout %1")
+                        .arg(QTime::currentTime().toString()).arg(command);
         }
     } else {
-        qDebug() << QString("Wait write request timeout %1")
-                    .arg(QTime::currentTime().toString());
+        qDebug() << QString("Wait write request %2 timeout %1")
+                    .arg(QTime::currentTime().toString()).arg(command);
     }
     return false;
 }
