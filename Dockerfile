@@ -5,7 +5,7 @@ RUN git clone https://github.com/braoutch/ros2-wave-rover
 
 WORKDIR /ros2-wave-rover
 
-RUN . /opt/ros/humble/setup.sh && colcon build
+RUN echo "2" && . /opt/ros/humble/setup.sh && colcon build
 
 # Setup environment variables
 COPY entrypoint.sh /sbin/entrypoint.sh

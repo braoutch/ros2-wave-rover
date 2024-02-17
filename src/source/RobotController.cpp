@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <QtConcurrent/QtConcurrent>
 #include <JoypadController.hpp>
+#include <iostream>
 
 RobotController::RobotController() {
     // _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 1000000);
@@ -22,7 +23,7 @@ RobotController::RobotController() {
     qDebug() << "Joypad enabled: " << enable_joypad;
     qDebug() << "UART Address: " << QString::fromStdString(UART_address);
 
-    _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ SendCmdVel(msg); });
+    _pROS2Subscriber->SubscribeToTopic("/cmd_vel", [&](const geometry_msgs::msg::Twist::SharedPtr msg){ std::cout << "VEL // " << SendCmdVel(msg); });
 
     _pUARTSerialPort = std::make_shared<UARTSerialPort>(QString::fromStdString(UART_address), 1000000); // open automatically the first serial port that is found
     QObject::connect(this, &RobotController::SendRequestSync, [&](QString s) { _pUARTSerialPort->sendRequestSync(s);});
@@ -36,7 +37,7 @@ RobotController::RobotController() {
     }
 
     QString infos;
-    GetInformation(INFO_TYPE::DEVICE, infos);
+    // GetInformation(INFO_TYPE::DEVICE, infos);
     DisplayMessage(5, "", "Gros Pote", "se réveille", "");
 }
 
@@ -64,7 +65,7 @@ bool RobotController::DisplayMessage(int seconds, QString line_1, QString line_2
     SetOled(2, line_3);
     SetOled(3, line_4);
 
-    std::this_thread::sleep_for(std::chrono::seconds(15));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     return ResetOled();
 }
 
@@ -86,14 +87,15 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
 
     // Calculate the intensity of left and right wheels. Simple version.
     // Taken from https://hackernoon.com/unicycle-to-differential-drive-courseras-control-of-mobile-robots-with-ros-and-rosbots-part-2-6d27d15f2010#1e59
-    l = 255.0 * ((x - z) / 2);
-    r = 255.0 * ((x + z) / 2);
+    l = 255.0 * ((x - z));
+    r = 255.0 * ((x + z));
 
     message_json["T"] = WAVE_ROVER_COMMAND_TYPE::SPEED_INPUT;
     message_json["L"] = (int)l;
     message_json["R"] = (int)r;
 
     qDebug() << "Sending CmdVel message " << QString::fromStdString(message_json.dump());
+    DisplayRollingMessage(QString::fromStdString(message_json.dump()));
     emit SendRequestSync(QString::fromStdString(message_json.dump()));
 
     return true;

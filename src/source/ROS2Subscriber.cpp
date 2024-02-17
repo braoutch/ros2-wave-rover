@@ -21,6 +21,7 @@ bool ROS2Subscriber::SubscribeToTopic(const QString& topic, std::function<void(c
     qDebug() << "Topic subscription.";
     _twist_subscriptions = this->create_subscription<geometry_msgs::msg::Twist>(
                                                 "/cmd_vel", rclcpp::SensorDataQoS().reliable(), [callback](const geometry_msgs::msg::Twist::SharedPtr msg){
+        std::cout << " >>> ";
         callback(msg);
     });
 
