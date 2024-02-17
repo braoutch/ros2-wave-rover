@@ -93,6 +93,7 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
     message_json["L"] = l;
     message_json["R"] = r;
 
+    qDebug() << "Sending CmdVel message " << QString::fromStdString(message_json.dump());
     emit SendRequestSync(QString::fromStdString(message_json.dump()));
 
     return true;
