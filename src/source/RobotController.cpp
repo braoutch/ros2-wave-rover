@@ -86,12 +86,12 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
 
     // Calculate the intensity of left and right wheels. Simple version.
     // Taken from https://hackernoon.com/unicycle-to-differential-drive-courseras-control-of-mobile-robots-with-ros-and-rosbots-part-2-6d27d15f2010#1e59
-    l = (x - z) / 2;
-    r = (x + z) / 2;
+    l = 255.0 * ((x - z) / 2);
+    r = 255.0 * ((x + z) / 2);
 
     message_json["T"] = WAVE_ROVER_COMMAND_TYPE::SPEED_INPUT;
-    message_json["L"] = l;
-    message_json["R"] = r;
+    message_json["L"] = (int)l;
+    message_json["R"] = (int)r;
 
     qDebug() << "Sending CmdVel message " << QString::fromStdString(message_json.dump());
     emit SendRequestSync(QString::fromStdString(message_json.dump()));
