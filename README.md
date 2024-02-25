@@ -1,5 +1,10 @@
 # ros2-wave-rover
 
+This is a ROS 2 driver for Waveshare Wave Rover.
+Should work with other waveshare robots based on JSON / UART communication (Offroad UGV, etc.)
+
+Basically, it's a node that subscribes to `cmd_vel` topic and runs the motors accrodingly.
+
 ## Requirements
 ```
 sudo apt install -y qtcreator qtbase5-dev qt5-qmake cmake libqt5serialport5-dev
