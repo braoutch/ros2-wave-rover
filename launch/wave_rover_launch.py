@@ -8,9 +8,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_joypad', default_value='0'),
         DeclareLaunchArgument('UART_address', default_value='/dev/ttyUSB0'),
         Node(
-            package='gros-pote',
+            package='grospote',
             namespace='gros_pote',
-            executable='gros-pote-node',
+            executable='grospote-node',
             name='robot',
             parameters=[
                 {"enable_joypad": LaunchConfiguration('enable_joypad')},

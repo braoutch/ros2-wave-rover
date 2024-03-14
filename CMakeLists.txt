@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(gros-pote LANGUAGES CXX)
+project(grospote LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -21,23 +21,23 @@ find_package(geometry_msgs REQUIRED)
 
 FILE(GLOB_RECURSE SRC ${CMAKE_SOURCE_DIR}/src/source/*.cpp ${CMAKE_SOURCE_DIR}/src/include/*.hpp)
 
-include_directories(gros-pote ${CMAKE_SOURCE_DIR}/src/include)
+include_directories(grospote ${CMAKE_SOURCE_DIR}/src/include)
 
-add_executable(gros-pote-node ${SRC}
+add_executable(grospote-node ${SRC}
 )
 
-target_include_directories(gros-pote-node PUBLIC
+target_include_directories(grospote-node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_features(gros-pote-node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_compile_features(grospote-node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
-install(TARGETS gros-pote-node
+install(TARGETS grospote-node
   DESTINATION lib/${PROJECT_NAME})
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
-ament_target_dependencies(gros-pote-node rclcpp geometry_msgs)
-target_link_libraries(gros-pote-node Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::SerialPort)
+ament_target_dependencies(grospote-node rclcpp geometry_msgs)
+target_link_libraries(grospote-node Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::SerialPort)
 
 
 # Install header files

@@ -10,6 +10,7 @@
 #include <iostream>
 
 RobotController::RobotController() {
+    qDebug() << "v1.0.0";
     // _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 1000000);
 
     _pROS2Subscriber = std::make_shared<ROS2Subscriber>();
@@ -37,7 +38,8 @@ RobotController::RobotController() {
     }
 
     QString infos;
-    // GetInformation(INFO_TYPE::DEVICE, infos);
+
+    qDebug() << "Initialization sequence...";
     DisplayMessage(5, "", "Gros Pote", "se réveille", "");
 }
 
@@ -65,7 +67,7 @@ bool RobotController::DisplayMessage(int seconds, QString line_1, QString line_2
     SetOled(2, line_3);
     SetOled(3, line_4);
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
     return ResetOled();
 }
 

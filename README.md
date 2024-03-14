@@ -20,6 +20,7 @@ socat -v -d -d PTY,raw,echo=0,b115200,cs8 PTY,raw,echo=0,b115200,cs8
 stty -F /dev/ttyUSB0 1000000 # set the baud rate
 cat /dev/ttyUSB0 # will receive commands that are sent from the robot
 echo -ne "{\"T\":-3}" > /dev/ttyUSB0 # will send commands
+echo -ne "{\"T\":1, \"L\":120, \"R\":120}" > /dev/ttyUSB0 # will send commands
 ```
 
 ## To create the udev rule
@@ -42,11 +43,11 @@ Then unplug and replug the device.
 
 # Run the docker image
 ```
-docker run -it --rm  braoutch/ros2-wave-rover ros2 launch gros-pote gros-pote-node
+docker run -it --rm  braoutch/ros2-wave-rover ros2 launch grospote grospote-node
 ```
 or
 ```
-docker run --privileged -v /dev/ttyS0:/dev/ttyS0 -v /dev/input:/dev/input -it --rm  braoutch/ros2-wave-rover  ros2 launch gros-pote wave_rover_launch.py enable_joypad:=1 UART_address:="/dev/ttyS0"
+docker run --privileged -v /dev/ttyS0:/dev/ttyS0 -v /dev/input:/dev/input -it --rm  braoutch/ros2-wave-rover  ros2 launch grospote wave_rover_launch.py enable_joypad:=0 UART_address:="/dev/ttyS0"
 ```
 It will also run (slowly) on x86 if you ran the qemu line before.
 
@@ -66,4 +67,9 @@ docker buildx build --platform linux/arm64 -t braoutch/ros2-wave-rover:latest --
 Send a twist message
 ```
 ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}"
+```
+
+Run the joypad node
+```
+ros2 launch grospote control_launch.py
 ```
