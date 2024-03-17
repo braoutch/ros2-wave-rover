@@ -10,7 +10,7 @@
 #include <iostream>
 
 RobotController::RobotController() {
-    qDebug() << "v1.0.0";
+    qDebug() << "v1.0.1";
     // _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 1000000);
 
     _pROS2Subscriber = std::make_shared<ROS2Subscriber>();
@@ -92,12 +92,15 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
     l = 255.0 * ((x - z));
     r = 255.0 * ((x + z));
 
+    l = std::max(std::min((double)l, 255.0), -255.0);
+    r = std::max(std::min((double)r, 255.0), -255.0);
+
     message_json["T"] = WAVE_ROVER_COMMAND_TYPE::SPEED_INPUT;
     message_json["L"] = (int)l;
     message_json["R"] = (int)r;
 
     qDebug() << "Sending CmdVel message " << QString::fromStdString(message_json.dump());
-    DisplayRollingMessage(QString::fromStdString(message_json.dump()));
+    // DisplayRollingMessage(QString::fromStdString(message_json.dump()));
     emit SendRequestSync(QString::fromStdString(message_json.dump()));
 
     return true;
