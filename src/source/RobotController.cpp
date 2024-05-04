@@ -10,7 +10,7 @@
 #include <iostream>
 
 RobotController::RobotController() {
-    qDebug() << "v1.0.1";
+    qDebug() << "v1.0.3";
     // _pUARTSerialPort = std::make_shared<UARTSerialPort>("/dev/pts/10", 1000000);
 
     _pROS2Subscriber = std::make_shared<ROS2Subscriber>();
@@ -98,6 +98,12 @@ bool RobotController::SendCmdVel(geometry_msgs::msg::Twist::SharedPtr msg){
     message_json["T"] = WAVE_ROVER_COMMAND_TYPE::SPEED_INPUT;
     message_json["L"] = (int)l;
     message_json["R"] = (int)r;
+
+    // When running backwards, to rotation must be inverted
+    if(x > 0) {
+        message_json["L"] = (int)r;
+        message_json["R"] = (int)l;
+    }
 
     qDebug() << "Sending CmdVel message " << QString::fromStdString(message_json.dump());
     // DisplayRollingMessage(QString::fromStdString(message_json.dump()));

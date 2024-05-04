@@ -60,8 +60,7 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
 ### Alternative
 ```
-docker buildx create --use
-docker buildx build --platform linux/arm64 -t braoutch/ros2-wave-rover:latest --push .
+docker build -t braoutch/ros2-wave-rover:1.0.2 . --progress=plain
 ```
 
 Send a twist message
